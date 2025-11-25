@@ -1,13 +1,4 @@
-"""
-Movie Central - Backend (FastAPI)
 
-Features:
-- Reads movies from movies.json (if missing rating history, generates synthetic rating_history)
-- Uses sentence-transformers (all-MiniLM-L6-v2) for semantic comparison of user responses
-- Filter recommendations by genre
-- Predict next rating using a simple linear forecast from rating_history
-- Return comparison graph (PNG) for top-N movie similarities
-"""
 
 import json
 import os
@@ -208,10 +199,7 @@ def recommend(req: RecommendRequest):
 
 @app.post("/recommend/graph")
 def recommend_graph(req: RecommendRequest):
-    """
-    Return a PNG bar chart comparing top-N movie similarity scores for the given user_text.
-    Accepts same body as /recommend. Returns image/png.
-    """
+  
     rec = recommend(req)
     top = rec.get("recommended_movies", [])
     if not top:
@@ -259,3 +247,4 @@ def root():
 # --- Start ---
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
