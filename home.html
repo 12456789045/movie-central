@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Movie Central — Grid UI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#071014;
+  --panel:#0f1518;
+  --card:#0d1113;
+  --accent:#e50914;
+  --muted:#98a0a6;
+  --glass: rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box;font-family:'Poppins',sans-serif}
+html,body{height:100%;margin:0;background:
+  radial-gradient(1200px 500px at 10% 10%, rgba(229,9,20,0.06), transparent),
+  linear-gradient(180deg,#020409 0%, #071014 100%);
+  color:#fff;}
+
+/* Top header */
+.header{
+  position:sticky;top:0;z-index:60;
+  background:linear-gradient(180deg, rgba(3,3,3,0.25), rgba(3,3,3,0.05));
+  backdrop-filter: blur(6px);
+  padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-bottom:1px solid rgba(255,255,255,0.02);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .mark{
+  width:46px;height:46px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),#ff7b7b);
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;
+  box-shadow:0 8px 30px rgba(229,9,20,0.08);
+}
+.brand .title{font-size:20px;font-weight:700;letter-spacing:1px}
+
+/* header controls */
+.controls{display:flex;gap:10px;align-items:center}
+.input, select{
+  padding:10px 12px;border-radius:10px;border:none;background:var(--panel);color:#fff;outline:none;
+  min-width:160px;
+}
+.button{background:var(--accent);border:none;padding:10px 12px;border-radius:10px;color:#fff;cursor:pointer}
+.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px 12px;border-radius:10px;color:#fff}
+
+/* main container */
+.container{max-width:1200px;margin:22px auto;padding:0 18px}
+
+/* hero */
+.hero{
+  height:46vh;border-radius:12px;overflow:hidden;
+  background-image:url("https://images7.alphacoders.com/550/550739.jpg");
+  background-size:cover;background-position:center;position:relative;margin-bottom:20px;
+}
+.hero::after{content:'';position:absolute;inset:0;background:
+  linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.9));}
+.hero-content{position:absolute;left:36px;bottom:36px;z-index:2;max-width:680px}
+.hero h1{font-size:40px;margin:0 0 8px 0;letter-spacing:0.4px}
+.hero p{color:var(--muted);margin:0 0 12px 0}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px}
+.card{background:var(--card);border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .22s, box-shadow .22s;position:relative}
+.card:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(0,0,0,0.6)}
+.poster{width:100%;height:300px;object-fit:cover;display:block}
+.info{padding:12px}
+.info h3{margin:0 0 6px 0;font-size:16px}
+.info p{margin:0;color:var(--muted);font-size:13px}
+
+/* card overlay elements */
+.badge{position:absolute;left:10px;top:10px;background:rgba(0,0,0,0.5);padding:6px 8px;border-radius:6px;font-size:12px}
+.heart{position:absolute;right:10px;top:10px;background:rgba(0,0,0,0.45);padding:8px;border-radius:8px}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;padding:20px;z-index:200}
+.modal-card{width:100%;max-width:900px;background:linear-gradient(180deg,#0b0f11,#071014);border-radius:12px;overflow:hidden}
+.modal-body{display:flex;flex-direction:column;padding:18px;gap:10px}
+.modal-body h2{margin:0}
+.frame{width:100%;height:420px;border:none;border-radius:8px;display:block}
+
+/* reviews */
+.review-box{background:var(--panel);padding:12px;border-radius:10px}
+.review-list{margin-top:12px;max-height:220px;overflow:auto;padding-right:6px}
+.review-item{background:#071018;padding:10px;border-radius:8px;border-left:4px solid var(--accent);margin-bottom:8px}
+.meta{color:var(--muted);font-size:13px}
+
+/* footer small note */
+.note{color:var(--muted);font-size:13px;margin-top:18px;text-align:center}
+
+/* responsive */
+@media (max-width:900px){
+  .hero{height:36vh}
+  .poster{height:220px}
+  .card{min-height:0}
+  .frame{height:260px}
+  .container{padding:0 12px}
+  .controls{display:flex;flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="brand">
+    <div class="mark">MC</div>
+    <div class="title">Movie Central</div>
+  </div>
+
+  <div class="controls">
+    <input id="searchInput" class="input" placeholder="Search movies or descriptions..." />
+    <select id="genreSelect">
+      <option value="">All Genres</option>
+    </select>
+    <button id="openListBtn" class="ghost">My List</button>
+    <button id="resetBtn" class="ghost">Reset</button>
+  </div>
+</div>
+
+<!-- Main -->
+<main class="container">
+  <section class="hero" id="hero">
+    <div class="hero-content">
+      <h1 id="heroTitle">Interstellar</h1>
+      <p id="heroDesc">A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.</p>
+      <div style="margin-top:12px">
+        <button id="playHero" class="button">▶ Play Trailer</button>
+        <button id="addHero" class="ghost">+ My List</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="grid" id="movieGrid" aria-live="polite"></div>
+  </section>
+
+  <div class="note">All reviews and watchlist are stored at movie central.</div>
+</main>
+
+<!-- Modal -->
+<div id="modal" class="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <iframe id="modalFrame" class="frame" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <div class="modal-body">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <h2 id="modalTitle">Title</h2>
+          <div class="meta" id="modalMeta">Genre • Year • Rating</div>
+        </div>
+        <div>
+          <button id="modalWatchBtn" class="button">+ My List</button>
+          <button id="modalClose" class="ghost">Close</button>
+        </div>
+      </div>
+
+      <p id="modalDesc" class="meta"></p>
+
+      <div class="review-box">
+        <textarea id="reviewText" rows="3" style="width:100%;padding:10px;border-radius:8px;border:none;background:#061014;color:#fff" placeholder="Write your review..."></textarea>
+        <input id="reviewScore" type="number" min="1" max="10" style="margin-top:8px;padding:10px;border-radius:8px;border:none;background:#061014;color:#fff" placeholder="Rating (1-10)">
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <button id="submitReview" class="button">Submit Review</button>
+          <button id="clearReviews" class="ghost">Clear Reviews</button>
+        </div>
+
+        <div class="review-list" id="reviewList" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Professional Grid UI - Frontend only */
+
+/* --- movie dataset (20) --- */
+const movies = [
+  {id:1,title:"Inception",genre:"Sci-Fi",year:2010,rating:8.8,poster:"https://c8.alamy.com/comp/DBW2R3/inception-2010-leonardo-dicaprio-christopher-nolan-dir-016-moviestore-DBW2R3.jpg",trailer:"https://www.youtube.com/embed/YoHD9XEInc0",desc:"A thief steals corporate secrets through dream-sharing technology."},
+  {id:2,title:"Interstellar",genre:"Sci-Fi",year:2014,rating:8.6,poster:"https://images7.alphacoders.com/550/550739.jpg",trailer:"https://www.youtube.com/embed/zSWdZVtXT7E",desc:"Explorers travel through a wormhole to ensure humanity's survival."},
+  {id:3,title:"The Matrix",genre:"Sci-Fi",year:1999,rating:8.7,poster:"https://alternativemovieposters.com/wp-content/uploads/2022/03/Aldo-Galvan_Matrix.jpg",trailer:"https://www.youtube.com/embed/m8e-FF8MsqU",desc:"A hacker discovers reality is a simulation."},
+  {id:4,title:"Avatar",genre:"Sci-Fi",year:2009,rating:7.8,poster:"https://image.tmdb.org/t/p/original/jRXYjXNq0Cs2TcJjLkki24MLp7u.jpg",trailer:"https://www.youtube.com/embed/5PSNL1qE6VY",desc:"A marine on an alien planet torn between two worlds."},
+  {id:5,title:"Joker",genre:"Thriller",year:2019,rating:8.5,poster:"https://wallpapercave.com/wp/wp4606146.jpg",trailer:"https://www.youtube.com/embed/zAGVQLHvwOY",desc:"Origin story of the Joker and his descent into madness."},
+  {id:6,title:"Shutter Island",genre:"Thriller",year:2010,rating:8.1,poster:"https://m.media-amazon.com/images/I/81FNja+9-iL._SL1500_.jpg",trailer:"https://www.youtube.com/embed/5iaYLCiq5RM",desc:"A U.S. Marshal investigates a psychiatric facility."},
+  {id:7,title:"Gone Girl",genre:"Thriller",year:2014,rating:8.1,poster:"https://posters.movieposterdb.com/14_10/2014/2267998/l_2267998_4abdc3a9.jpg",trailer:"https://www.youtube.com/embed/2-_-1nJf8Vg",desc:"A man becomes the prime suspect in his wife's disappearance."},
+  {id:8,title:"Tenet",genre:"Thriller",year:2020,rating:7.4,poster:"https://picfiles.alphacoders.com/368/368886.jpg",trailer:"https://www.youtube.com/embed/AZGcmvrTX9M",desc:"A secret agent manipulates time to prevent global catastrophe."},
+  {id:9,title:"Avengers Endgame",genre:"Action",year:2019,rating:8.4,poster:"https://vignette.wikia.nocookie.net/marvelcinematicuniverse/images/9/91/Endgame_Poster_2.jpg/revision/latest?cb=20190314215527",trailer:"https://www.youtube.com/embed/TcMBFSGVi1c",desc:"Avengers assemble to undo Thanos' actions."},
+  {id:10,title:"John Wick",genre:"Action",year:2014,rating:7.4,poster:"https://static1.srcdn.com/wordpress/wp-content/uploads/2024/01/john-wick-franchise-poster.jpg",trailer:"https://www.youtube.com/embed/2AUmvWm5ZDQ",desc:"An ex-hitman comes out of retirement for revenge."},
+  {id:11,title:"Mad Max Fury Road",genre:"Action",year:2015,rating:8.1,poster:"https://image.tmdb.org/t/p/original/hA2ple9q4qnwxp3hKVNhroipsir.jpg",trailer:"https://www.youtube.com/embed/hEJnMQG9ev8",desc:"Post-apocalyptic chase across the Wasteland."},
+  {id:12,title:"The Dark Knight",genre:"Action",year:2008,rating:9.0,poster:"https://m.media-amazon.com/images/S/pv-target-images/e9a43e647b2ca70e75a3c0af046c4dfdcd712380889779cbdc2c57d94ab63902.jpg",trailer:"https://www.youtube.com/embed/EXeTwQWrcwY",desc:"Batman faces the Joker in a battle for Gotham."},
+  {id:13,title:"Titanic",genre:"Romance",year:1997,rating:7.8,poster:"https://cdn.shopify.com/s/files/1/1416/8662/products/titanic_1997_fr_original_film_art_1200x.jpg?v=1619289844",trailer:"https://www.youtube.com/embed/kVrqfYjkTdQ",desc:"Love story aboard the ill-fated ship."},
+  {id:14,title:"La La Land",genre:"Romance",year:2016,rating:8.0,poster:"https://wallpapercave.com/wp/wp8872299.jpg",trailer:"https://www.youtube.com/embed/0pdqf4P9MB8",desc:"A musician and an actress fall in love in LA."},
+  {id:15,title:"The Notebook",genre:"Romance",year:2004,rating:7.8,poster:"https://static1.srcdn.com/wordpress/wp-content/uploads/2023/06/the-notebook-movie-poster.jpg",trailer:"https://www.youtube.com/embed/FC6biTjEyZw",desc:"An enduring love story told across decades."},
+  {id:16,title:"A Star is Born",genre:"Romance",year:2018,rating:7.6,poster:"https://m.media-amazon.com/images/M/MV5BNmE5ZmE3OGItNTdlNC00YmMxLWEzNjctYzAwOGQ5ODg0OTI0XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",trailer:"https://www.youtube.com/embed/nSbzyEJ8X9E",desc:"A rising singer and a fading star fall in love."},
+  {id:17,title:"Conjuring",genre:"Horror",year:2013,rating:7.5,poster:"https://www.heyuguys.com/images/2013/05/The-Conjuring-Poster.jpg",trailer:"https://www.youtube.com/embed/k10ETZ41q5o",desc:"Paranormal investigators help a family terrorized by a dark presence."},
+  {id:18,title:"Nun",genre:"Horror",year:2018,rating:5.9,poster:"https://image.tmdb.org/t/p/original/4VeFyduGXSk7mXlmD7sxSNsESW7.jpg",trailer:"https://www.youtube.com/embed/pzD9zGcUNrw",desc:"A priest and a novice investigate a mysterious death in Romania."},
+  {id:19,title:"Insidious",genre:"Horror",year:2010,rating:6.8,poster:"https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p8494407_p_v10_ak.jpg",trailer:"https://www.youtube.com/embed/zuZnRUcoWos",desc:"A family looks to prevent evil spirits from trapping their child."},
+  {id:20,title:"IT",genre:"Horror",year:2017,rating:7.3,poster:"https://www.classification.gov.au/sites/default/files/posters/9E2y5Q7WlCVNEhP5GiVTjhEhx1o.jpg",trailer:"https://www.youtube.com/embed/hAUTdjf9rko",desc:"Kids confront an ancient evil in their town."}
+];
+
+/* --- elements --- */
+const grid = document.getElementById('movieGrid');
+const genreSelect = document.getElementById('genreSelect');
+const searchInput = document.getElementById('searchInput');
+const modal = document.getElementById('modal');
+const modalFrame = document.getElementById('modalFrame');
+const modalTitle = document.getElementById('modalTitle');
+const modalMeta = document.getElementById('modalMeta');
+const modalDesc = document.getElementById('modalDesc');
+const reviewList = document.getElementById('reviewList');
+const submitReviewBtn = document.getElementById('submitReview');
+const reviewText = document.getElementById('reviewText');
+const reviewScore = document.getElementById('reviewScore');
+const modalWatchBtn = document.getElementById('modalWatchBtn');
+const modalClose = document.getElementById('modalClose');
+const heroTitle = document.getElementById('heroTitle');
+const heroDesc = document.getElementById('heroDesc');
+const hero = document.getElementById('hero');
+const playHero = document.getElementById('playHero');
+const addHero = document.getElementById('addHero');
+const openListBtn = document.getElementById('openListBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+/* --- helpers for localStorage --- */
+function keyReviews(title){ return `mc_reviews::${title}`; }
+function keyWatchlist(){ return 'mc_watchlist'; }
+function loadReviewsFor(title){ return JSON.parse(localStorage.getItem(keyReviews(title))||'[]'); }
+function saveReviewsFor(title, arr){ localStorage.setItem(keyReviews(title), JSON.stringify(arr)); }
+function loadWatchlist(){ return JSON.parse(localStorage.getItem(keyWatchlist())||'[]'); }
+function saveWatchlist(arr){ localStorage.setItem(keyWatchlist(), JSON.stringify(arr)); }
+
+/* --- populate genre select --- */
+function loadGenres(){
+  const gset = new Set(movies.map(m=>m.genre));
+  gset.forEach(g=>{
+    const o = document.createElement('option'); o.value = g; o.textContent = g;
+    genreSelect.appendChild(o);
+  });
+}
+
+/* --- render grid --- */
+function renderGrid(list){
+  grid.innerHTML = '';
+  if(!list.length){
+    grid.innerHTML = '<div style="padding:24px;color:var(--muted);grid-column:1/-1">No movies found</div>';
+    return;
+  }
+  list.forEach(m=>{
+    const card = document.createElement('div'); card.className='card';
+    card.innerHTML = `
+      <div class="badge small">${m.year}</div>
+      <div class="heart small" title="Rating: ${m.rating.toFixed(1)}">⭐ ${m.rating}</div>
+      <img class="poster" src="${m.poster}" alt="${m.title}">
+      <div class="info"><h3>${m.title}</h3><p>${m.genre}</p></div>
+    `;
+    card.onclick = ()=> openModalFor(m);
+    grid.appendChild(card);
+  });
+}
+
+/* --- open modal --- */
+let current = null;
+function openModalFor(movie){
+  current = movie;
+  modalFrame.src = movie.trailer + '?autoplay=1';
+  modalTitle.textContent = movie.title;
+  modalMeta.textContent = `${movie.genre} • ${movie.year} • Rating ${movie.rating}`;
+  modalDesc.textContent = movie.desc;
+  loadReviewsUI(movie.title);
+  // watchlist button label
+  const list = loadWatchlist();
+  modalWatchBtn.textContent = list.includes(movie.title) ? 'Remove from My List' : '+ My List';
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden','false');
+}
+
+/* --- close modal --- */
+function closeModal(){
+  modalFrame.src = '';
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden','true');
+}
+
+/* --- reviews UI --- */
+function loadReviewsUI(title){
+  const arr = loadReviewsFor(title);
+  reviewList.innerHTML = '';
+  if(!arr.length){ reviewList.innerHTML = '<div class="meta">No reviews yet — be the first!</div>'; return; }
+  arr.slice().reverse().forEach(r=>{
+    const d = document.createElement('div'); d.className='review-item';
+    d.innerHTML = `<strong>⭐ ${r.score}</strong> <span class="meta" style="margin-left:8px">${new Date(r.ts).toLocaleString()}</span><div style="margin-top:6px;color:#ddd">${escapeHtml(r.text)}</div>`;
+    reviewList.appendChild(d);
+  });
+}
+
+/* --- submit review --- */
+submitReviewBtn.addEventListener('click', ()=>{
+  if(!current) return alert('No movie selected');
+  const txt = reviewText.value.trim();
+  const score = parseFloat(reviewScore.value);
+  if(!txt || !score || score < 1 || score > 10) return alert('Enter review text and rating (1-10)');
+  const arr = loadReviewsFor(current.title);
+  arr.push({text:txt,score,ts:Date.now()});
+  saveReviewsFor(current.title, arr);
+  reviewText.value = ''; reviewScore.value = '';
+  loadReviewsUI(current.title);
+});
+
+/* --- clear reviews for current movie --- */
+document.getElementById('clearReviews').addEventListener('click', ()=>{
+  if(!current) return;
+  if(!confirm('Clear all reviews for this movie?')) return;
+  saveReviewsFor(current.title, []);
+  loadReviewsUI(current.title);
+});
+
+/* --- watchlist toggle --- */
+modalWatchBtn.addEventListener('click', ()=>{
+  if(!current) return;
+  const list = loadWatchlist();
+  const ix = list.indexOf(current.title);
+  if(ix >= 0){ list.splice(ix,1); modalWatchBtn.textContent = '+ My List'; alert('Removed from My List'); }
+  else{ list.push(current.title); modalWatchBtn.textContent = 'Remove from My List'; alert('Added to My List'); }
+  saveWatchlist(list);
+});
+
+/* --- open hero trailer --- */
+playHero.addEventListener('click', ()=>{
+  // find hero movie
+  const heroMovie = movies.find(m=>m.title === heroTitle.textContent) || movies[1];
+  openModalFor(heroMovie);
+});
+addHero.addEventListener('click', ()=>{
+  const heroMovie = movies.find(m=>m.title === heroTitle.textContent) || movies[1];
+  const list = loadWatchlist();
+  if(!list.includes(heroMovie.title)){ list.push(heroMovie.title); saveWatchlist(list); alert('Added to My List'); } else alert('Already in My List');
+});
+
+/* --- open watchlist page (simple replacement of grid) --- */
+openListBtn.addEventListener('click', ()=>{
+  const list = loadWatchlist();
+  if(!list.length) { alert('My List is empty'); return; }
+  const selected = movies.filter(m => list.includes(m.title));
+  renderGrid(selected);
+});
+
+/* --- reset to all movies --- */
+resetBtn.addEventListener('click', ()=> { renderGrid(movies); genreSelect.value=''; searchInput.value=''; setHeroFrom(movies[1]); });
+
+/* --- search & filter --- */
+searchInput.addEventListener('input', ()=> applyFilters());
+genreSelect.addEventListener('change', ()=> applyFilters());
+
+function applyFilters(){
+  const q = searchInput.value.trim().toLowerCase();
+  const g = genreSelect.value;
+  const filtered = movies.filter(m => (g ? m.genre === g : true) && (m.title.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q)));
+  renderGrid(filtered);
+}
+
+/* --- hero selection --- */
+function setHeroFrom(movie){
+  hero.style.backgroundImage = `url('${movie.poster}')`;
+  heroTitle.textContent = movie.title;
+  heroDesc.textContent = movie.desc;
+}
+
+/* --- escape helper --- */
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
+
+/* --- modal close handlers --- */
+modalClose.addEventListener('click', closeModal);
+modal.addEventListener('click', (e)=> { if(e.target === modal) closeModal(); });
+
+/* --- init --- */
+loadGenres();
+renderGrid(movies);
+setHeroFrom(movies[1]);
+</script>
+</body>
+</html>
